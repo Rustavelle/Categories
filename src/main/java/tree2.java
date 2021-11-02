@@ -38,7 +38,7 @@ public class tree2 {
             query1.executeUpdate();
             query2.executeUpdate();
             manager.getTransaction().commit();
-        }catch (Exception e){
+        } catch (Exception e) {
             manager.getTransaction().rollback();
             e.printStackTrace();
         }

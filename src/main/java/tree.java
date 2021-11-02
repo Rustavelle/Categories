@@ -4,36 +4,8 @@ import java.util.Scanner;
 
 public class tree {
     public static void main(String[] args) {
-        //описать сущность для таблицы
         EntityManagerFactory factory = Persistence.createEntityManagerFactory("main");
         EntityManager manager = factory.createEntityManager();
-
-        // Комплетующие
-        // - Процессоры
-        // - - Intel
-        // - - AMD
-        // - ОЗУ
-
-        /*TypedQuery<Categories> categoriesTypedQuery = manager.createQuery
-                ("select c from Categories c ", Categories.class);*/
-        //List<Categories> categories = categoriesTypedQuery.getResultList();
-        //String x = "-";
-       /* for (Categories category : categories) {
-            String repeated = x.repeat(category.getLevelCategory());
-            System.out.println(repeated + category.getName());
-        }*/
-        /*for (Categories category : categories) {
-            String dashes = "";// обнуление цикла
-            for (int i = 0; i < category.getLevelCategory(); i++) {
-                dashes += x; // замена пустоты на -
-            }
-            System.out.println(dashes + category.getName());
-    }*/
-// запросить ID категрии в нутри которой необходимо создать новую категорию
-// Название новой категории через NextLine
-// правый ключ увеличить на два если он больше или равен правому ключу род.элемента (6)
-// левый ключ увеличить на 2 если он больше или равен правому ключу родительского элемента
-
         // запросить id для освобождения места
         try {
             TypedQuery<Categories> categoriesTypedQuery = manager.createQuery
