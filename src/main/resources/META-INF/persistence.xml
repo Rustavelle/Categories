@@ -5,9 +5,9 @@
              version="3.0">
   <persistence-unit name="main">
     <properties>
-      <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3307/j1700_rustem_NewCatalog"/>
+      <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/j1700_rustem_NewCatalog"/>
       <property name="hibernate.connection.username" value="root"/>
-      <property name="hibernate.connection.password" value="root"/>
+      <property name="hibernate.connection.password" value="3885"/>
     </properties>
   </persistence-unit>
 </persistence>
