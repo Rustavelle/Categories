@@ -1,19 +1,16 @@
+import categories_main.Categories;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Scanner;
 
-public class CategoriesClass {
+public class Categories_class_main {
 
     public static Scanner scanner = new Scanner(System.in);
 
     public static EntityManagerFactory factory = Persistence. createEntityManagerFactory("main");
 
     public static void main(String[] args) {
-
-        // создание [1]
-        // Перемещение [2]
-        // Удаление [3]
-        // Выберите действие: _
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Выберете действие:\n 1)Создание \n 2)Перемещение \n 3)Удаление");
@@ -53,7 +50,6 @@ public class CategoriesClass {
                 String NewNameCategory = scanner.nextLine();
                 newCategory.setName(NewNameCategory);
                 manager.persist(newCategory);
-                manager.getTransaction().commit();
 
             } else if (Long.parseLong(categoryName) != 0) {
 
@@ -76,8 +72,8 @@ public class CategoriesClass {
                 String NewCategory = scanner.nextLine();
                 category.setName(NewCategory);
                 manager.persist(category);
-                manager.getTransaction().commit();
             }
+            manager.getTransaction().commit();
         } catch (Exception e) {
             manager.getTransaction().rollback();
             e.printStackTrace();
@@ -176,14 +172,14 @@ public class CategoriesClass {
 
                 manager.refresh(NewParent);
 
-                int sum1 = NewParent.getRightKey() - categories1.getRightKey() - 1;
-                int sum3 = NewParent.getLevelCategory() - categories1.getLevelCategory() + 1;
+                int newRightKey = NewParent.getRightKey() - categories1.getRightKey() - 1;
+                int newLevel = NewParent.getLevelCategory() - categories1.getLevelCategory() + 1;
 
                 Query newKeys = manager.createQuery
                         ("update Categories set LeftKey = 0 - LeftKey + ?1, RightKey = 0 - RightKey + ?1, " +
                                 "LevelCategory = LevelCategory + ?2 where LeftKey < 0 and RightKey < 0");
-                newKeys.setParameter(1, sum1);
-                newKeys.setParameter(2, sum3);
+                newKeys.setParameter(1, newRightKey);
+                newKeys.setParameter(2, newLevel);
                 newKeys.executeUpdate();
                 manager.getTransaction().commit();
             }
@@ -211,24 +207,24 @@ public class CategoriesClass {
             Categories categories1 = manager.find(Categories.class, Long.parseLong(categoryToDelete));
             System.out.println(categories1.getId() + " - "
                     + categories1.getLeftKey() + "-" + categories1.getRightKey() + " - " + categories1.getName());
-            int sum1 = categories1.getRightKey();
-            int sum2 = categories1.getRightKey() - categories1.getLeftKey() + 1;
-            int sum3 = categories1.getLeftKey();
+            int delRightKey = categories1.getRightKey();
+            int newRightKey = categories1.getRightKey() - categories1.getLeftKey() + 1;
+            int newLeftKey = categories1.getLeftKey();
             manager.getTransaction().begin();
 
             Query deleteKeys = manager.createQuery("delete from Categories where LeftKey >= ?1 and RightKey <= ?2");
-            deleteKeys.setParameter(1, sum3);
-            deleteKeys.setParameter(2, sum1);
+            deleteKeys.setParameter(1, newLeftKey);
+            deleteKeys.setParameter(2, delRightKey);
             deleteKeys.executeUpdate();
 
             Query updateRightKey = manager.createQuery("update Categories set RightKey = RightKey - ?2 where RightKey >= ?1");
-            updateRightKey.setParameter(1,sum1);
-            updateRightKey.setParameter(2, sum2);
+            updateRightKey.setParameter(1, delRightKey);
+            updateRightKey.setParameter(2, newRightKey);
             updateRightKey.executeUpdate();
 
             Query updateLeftKey = manager.createQuery("update Categories set LeftKey = LeftKey - ?2 where LeftKey > ?1");
-            updateLeftKey.setParameter(1, sum1);
-            updateLeftKey.setParameter(2, sum2);
+            updateLeftKey.setParameter(1, delRightKey);
+            updateLeftKey.setParameter(2, newRightKey);
             updateLeftKey.executeUpdate();
 
             manager.getTransaction().commit();

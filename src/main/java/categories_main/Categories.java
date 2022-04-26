@@ -1,3 +1,4 @@
+package categories_main;
 
 import javax.persistence.*;
 
