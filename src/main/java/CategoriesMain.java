@@ -1,10 +1,10 @@
-import categories_main.Categories;
+import entity.Category;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Scanner;
 
-public class Categories_class_main {
+public class CategoriesMain {
 
     public static Scanner scanner = new Scanner(System.in);
 
@@ -26,10 +26,10 @@ public class Categories_class_main {
 
         EntityManager manager = factory.createEntityManager();
         try {
-            TypedQuery<Categories> categoriesTypedQuery = manager.createQuery
-                    ("select c from Categories c", Categories.class);
-            List<Categories> categoriesList = categoriesTypedQuery.getResultList();
-            for (Categories categories : categoriesList) {
+            TypedQuery<Category> categoriesTypedQuery = manager.createQuery
+                    ("select c from Category c", Category.class);
+            List<Category> categoriesList = categoriesTypedQuery.getResultList();
+            for (Category categories : categoriesList) {
                 System.out.println(categories.getId() + " - "
                         + categories.getLeftKey() + "-" + categories.getRightKey() + " - " + categories.getName());
             }
@@ -40,9 +40,9 @@ public class Categories_class_main {
 
             if (Long.parseLong(categoryName) == 0) {
                 TypedQuery<Integer> maxRightKeyQuery = manager.createQuery
-                        ("select max(c.RightKey) from Categories c", Integer.class);
+                        ("select max(c.RightKey) from Category c", Integer.class);
                 List<Integer> maxRightKeyQueryList = maxRightKeyQuery.getResultList();
-                Categories newCategory = new Categories();
+                Category newCategory = new Category();
                 newCategory.setLeftKey(maxRightKeyQueryList.get(0) + 1);
                 newCategory.setRightKey(maxRightKeyQueryList.get(0) + 2);
                 newCategory.setLevelCategory(0);
@@ -53,17 +53,17 @@ public class Categories_class_main {
 
             } else if (Long.parseLong(categoryName) != 0) {
 
-                Categories categories = manager.find(Categories.class, Long.parseLong(categoryName));
+                Category categories = manager.find(Category.class, Long.parseLong(categoryName));
 
-                Query updateRightKey = manager.createQuery("update Categories set RightKey = RightKey + 2 where RightKey >= ?1");
+                Query updateRightKey = manager.createQuery("update Category set RightKey = RightKey + 2 where RightKey >= ?1");
                 updateRightKey.setParameter(1, categories.getRightKey());
                 updateRightKey.executeUpdate();
 
-                Query updateLeftKey = manager.createQuery("update Categories set LeftKey = LeftKey + 2 where LeftKey > ?1");
+                Query updateLeftKey = manager.createQuery("update Category set LeftKey = LeftKey + 2 where LeftKey > ?1");
                 updateLeftKey.setParameter(1, categories.getRightKey());
                 updateLeftKey.executeUpdate();
 
-                Categories category = new Categories();
+                Category category = new Category();
                 category.setLeftKey(categories.getRightKey());
                 category.setRightKey(categories.getRightKey() + 1);
                 category.setLevelCategory(categories.getLevelCategory() + 1);
@@ -86,17 +86,17 @@ public class Categories_class_main {
 
         try {
             manager.getTransaction().begin();
-            TypedQuery<Categories> categoriesTypedQuery = manager.createQuery
-                    ("select c from Categories c", Categories.class);
-            List<Categories> categoriesList = categoriesTypedQuery.getResultList();
-            for (Categories categories : categoriesList) {
+            TypedQuery<Category> categoriesTypedQuery = manager.createQuery
+                    ("select c from Category c", Category.class);
+            List<Category> categoriesList = categoriesTypedQuery.getResultList();
+            for (Category categories : categoriesList) {
                 System.out.println(categories.getId() + " - "
                         + categories.getLeftKey() + "-" + categories.getRightKey() + " - " + categories.getName());
             }
 
             System.out.println("Выберете категорию что перенести : ");
             String category = scanner.nextLine();
-            Categories categories1 = manager.find(Categories.class, Long.parseLong(category));
+            Category categories1 = manager.find(Category.class, Long.parseLong(category));
             System.out.println(categories1.getId() + " - "
                     + categories1.getLeftKey() + "-" + categories1.getRightKey() + " - " + categories1.getName());
 
@@ -104,7 +104,7 @@ public class Categories_class_main {
             String categorySetId = scanner.nextLine();
 
             if (Long.parseLong(categorySetId) == 0) {
-                Query updateKeys = manager.createQuery("update Categories set " +
+                Query updateKeys = manager.createQuery("update Category set " +
                         "LeftKey = LeftKey * -1, RightKey = RightKey * -1 where LeftKey >= ?1 and RightKey <= ?2");
                 updateKeys.setParameter(1, categories1.getLeftKey());
                 updateKeys.setParameter(2, categories1.getRightKey());
@@ -112,22 +112,22 @@ public class Categories_class_main {
 
                 int moveSize = categories1.getRightKey() - categories1.getLeftKey() + 1;
                 Query updateRightKey = manager.createQuery
-                        ("update Categories set RightKey = RightKey - ?1 where RightKey >= ?2");
+                        ("update Category set RightKey = RightKey - ?1 where RightKey >= ?2");
                 updateRightKey.setParameter(1, moveSize);
                 updateRightKey.setParameter(2, categories1.getRightKey());
                 updateRightKey.executeUpdate();
 
-                Query updateLeftKey = manager.createQuery("update Categories set LeftKey = LeftKey - ?1 where LeftKey > ?2");
+                Query updateLeftKey = manager.createQuery("update Category set LeftKey = LeftKey - ?1 where LeftKey > ?2");
                 updateLeftKey.setParameter(1, moveSize);
                 updateLeftKey.setParameter(2, categories1.getRightKey());
                 updateLeftKey.executeUpdate();
 
                 TypedQuery<Integer> maxRightKeyQuery = manager.createQuery
-                        ("select max(c.RightKey) from Categories c", Integer.class);
+                        ("select max(c.RightKey) from Category c", Integer.class);
                 List<Integer> maxRightKeyQueryList = maxRightKeyQuery.getResultList();
                 int maxRightKey = maxRightKeyQueryList.get(0);
 
-                Query maxRightKeysQuery = manager.createQuery("update Categories set " +
+                Query maxRightKeysQuery = manager.createQuery("update Category set " +
                         "LeftKey = 0 - LeftKey - ?1 + ?2 + 1, RightKey = 0 - RightKey - ?1 + ?2 + 1," +
                         " LevelCategory = LevelCategory - ?3  where LeftKey < 0 and RightKey < 0");
                 maxRightKeysQuery.setParameter(1, categories1.getLeftKey());
@@ -138,7 +138,7 @@ public class Categories_class_main {
                 manager.getTransaction().commit();
 
             } else if (Long.parseLong(categorySetId) != 0) {
-                Query updateKeys = manager.createQuery("update Categories set " +
+                Query updateKeys = manager.createQuery("update Category set " +
                         "LeftKey = LeftKey * -1, RightKey = RightKey * -1 where LeftKey >= ?1 and RightKey <= ?2");
                 updateKeys.setParameter(1, categories1.getLeftKey());
                 updateKeys.setParameter(2, categories1.getRightKey());
@@ -146,26 +146,26 @@ public class Categories_class_main {
 
                 int moveSize = categories1.getRightKey() - categories1.getLeftKey() + 1;
                 Query updateRightKey = manager.createQuery
-                        ("update Categories set RightKey = RightKey - ?1 where RightKey >= ?2");
+                        ("update Category set RightKey = RightKey - ?1 where RightKey >= ?2");
                 updateRightKey.setParameter(1, moveSize);
                 updateRightKey.setParameter(2, categories1.getRightKey());
                 updateRightKey.executeUpdate();
 
-                Query updateLeftKey = manager.createQuery("update Categories set LeftKey = LeftKey - ?1 where LeftKey > ?2");
+                Query updateLeftKey = manager.createQuery("update Category set LeftKey = LeftKey - ?1 where LeftKey > ?2");
                 updateLeftKey.setParameter(1, moveSize);
                 updateLeftKey.setParameter(2, categories1.getRightKey());
                 updateLeftKey.executeUpdate();
 
-                Categories NewParent = manager.find(Categories.class, Long.parseLong(categorySetId));
+                Category NewParent = manager.find(Category.class, Long.parseLong(categorySetId));
                 manager.refresh(NewParent);
                 System.out.println(NewParent.getId() + " - "
                         + NewParent.getLeftKey() + "-" + NewParent.getRightKey() + " - " + NewParent.getName());
-                Query updateNewRKey = manager.createQuery("update Categories set RightKey = RightKey + ?1 where RightKey >= ?2");
+                Query updateNewRKey = manager.createQuery("update Category set RightKey = RightKey + ?1 where RightKey >= ?2");
                 updateNewRKey.setParameter(1, moveSize);
                 updateNewRKey.setParameter(2, NewParent.getRightKey());
                 updateNewRKey.executeUpdate();
 
-                Query updateNewLKey = manager.createQuery("update Categories set LeftKey = LeftKey + ?1 where LeftKey > ?2");
+                Query updateNewLKey = manager.createQuery("update Category set LeftKey = LeftKey + ?1 where LeftKey > ?2");
                 updateNewLKey.setParameter(1, moveSize);
                 updateNewLKey.setParameter(2, NewParent.getRightKey());
                 updateNewLKey.executeUpdate();
@@ -176,7 +176,7 @@ public class Categories_class_main {
                 int newLevel = NewParent.getLevelCategory() - categories1.getLevelCategory() + 1;
 
                 Query newKeys = manager.createQuery
-                        ("update Categories set LeftKey = 0 - LeftKey + ?1, RightKey = 0 - RightKey + ?1, " +
+                        ("update Category set LeftKey = 0 - LeftKey + ?1, RightKey = 0 - RightKey + ?1, " +
                                 "LevelCategory = LevelCategory + ?2 where LeftKey < 0 and RightKey < 0");
                 newKeys.setParameter(1, newRightKey);
                 newKeys.setParameter(2, newLevel);
@@ -194,17 +194,17 @@ public class Categories_class_main {
         EntityManager manager = factory.createEntityManager();
 
         try {
-            TypedQuery<Categories> categoriesTypedQuery = manager.createQuery
-                    ("select c from Categories c", Categories.class);
-            List<Categories> categoriesList = categoriesTypedQuery.getResultList();
-            for (Categories categories : categoriesList) {
+            TypedQuery<Category> categoriesTypedQuery = manager.createQuery
+                    ("select c from Category c", Category.class);
+            List<Category> categoriesList = categoriesTypedQuery.getResultList();
+            for (Category categories : categoriesList) {
                 System.out.println(categories.getId() + " - "
                         + categories.getLeftKey() + "-" + categories.getRightKey() + " - " + categories.getName());
             }
 
             System.out.println("Выберете категорию для удаления: ");
             String categoryToDelete = scanner.nextLine();
-            Categories categories1 = manager.find(Categories.class, Long.parseLong(categoryToDelete));
+            Category categories1 = manager.find(Category.class, Long.parseLong(categoryToDelete));
             System.out.println(categories1.getId() + " - "
                     + categories1.getLeftKey() + "-" + categories1.getRightKey() + " - " + categories1.getName());
             int delRightKey = categories1.getRightKey();
@@ -212,17 +212,17 @@ public class Categories_class_main {
             int newLeftKey = categories1.getLeftKey();
             manager.getTransaction().begin();
 
-            Query deleteKeys = manager.createQuery("delete from Categories where LeftKey >= ?1 and RightKey <= ?2");
+            Query deleteKeys = manager.createQuery("delete from Category where LeftKey >= ?1 and RightKey <= ?2");
             deleteKeys.setParameter(1, newLeftKey);
             deleteKeys.setParameter(2, delRightKey);
             deleteKeys.executeUpdate();
 
-            Query updateRightKey = manager.createQuery("update Categories set RightKey = RightKey - ?2 where RightKey >= ?1");
+            Query updateRightKey = manager.createQuery("update Category set RightKey = RightKey - ?2 where RightKey >= ?1");
             updateRightKey.setParameter(1, delRightKey);
             updateRightKey.setParameter(2, newRightKey);
             updateRightKey.executeUpdate();
 
-            Query updateLeftKey = manager.createQuery("update Categories set LeftKey = LeftKey - ?2 where LeftKey > ?1");
+            Query updateLeftKey = manager.createQuery("update Category set LeftKey = LeftKey - ?2 where LeftKey > ?1");
             updateLeftKey.setParameter(1, delRightKey);
             updateLeftKey.setParameter(2, newRightKey);
             updateLeftKey.executeUpdate();
